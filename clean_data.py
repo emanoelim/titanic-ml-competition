@@ -1,5 +1,5 @@
-csv = 'C:/Users/Manu/Documents/Python/ProjetosImagens/Titanic2/train.csv'
-cleaned_csv = 'C:/Users/Manu/Documents/Python/ProjetosImagens/Titanic2/train_cleaned.csv'
+csv = 'C:/Users/Manu/Documents/Python/ProjetosImagens/Titanic2/test.csv'
+cleaned_csv = 'C:/Users/Manu/Documents/Python/ProjetosImagens/Titanic2/test_cleaned.csv'
 
 with open(csv) as f:
     samples = f.readlines()
@@ -35,7 +35,8 @@ ids = list(map(int, ids))
 # print(ids)
 
 # --- survived ---
-survived = list(map(int, survived))
+if survived[0] != '':
+    survived = list(map(int, survived))
 # print(survived)
 
 # --- pclass ---
