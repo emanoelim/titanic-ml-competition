@@ -37,6 +37,8 @@ ids = list(map(int, ids))
 # --- survived ---
 if survived[0] != '':
     survived = list(map(int, survived))
+else:
+    survived = [3] * len(survived)
 # print(survived)
 
 # --- pclass ---
@@ -55,28 +57,28 @@ for x in name:
 # print(title)
 
 # simplify titles: Mr, Mrs, Mister, Miss
-simplified = []
+simplified_title = []
 for x, y in zip(title, sex):
     if x in ['Don', 'Major', 'Capt', 'Jonkheer', 'Rev', 'Col']:
-        simplified.append(0) # Mr
+        simplified_title.append(0) # Mr
     elif x in ['Countess', 'Mme']:
-        simplified.append(1) # Mrs
+        simplified_title.append(1) # Mrs
     elif x in ['Master']:
-        simplified.append(2) # Master
+        simplified_title.append(2) # Master
     elif x in ['Mlle', 'Ms']:
-        simplified.append(3) # Miss
+        simplified_title.append(3) # Miss
     elif x =='Dr':
         if y == 'Male':
-            simplified.append(0)
+            simplified_title.append(0)
         else:
-            simplified.append(1)
+            simplified_title.append(1)
     else:
-        simplified.append(4)
-# print(simplified)
+        simplified_title.append(4)
+# print(simplified_title)
 
 # create new feature: 1 - married, 0 - single
 status = []
-for x in simplified:
+for x in simplified_title:
     if x in [0, 1]: # Mr or Mrs
         status.append(1)
     else:
@@ -112,7 +114,7 @@ avg_adults = int(sum(adults) / len(adults))
 
 # put average age where ages are missing
 aux = []
-for x, y in zip(age, simplified):
+for x, y in zip(age, simplified_title):
     if x == '':
         if y in [0, 1]:
             aux.append(avg_adults)
@@ -174,7 +176,7 @@ for x in enbarked:
 enbarked = aux
 # print(enbarked)
 
-cleaned_features = [ids, survived, pclass, simplified, status, sex, age, sibsps,
+cleaned_features = [ids, survived, pclass, simplified_title, status, sex, age, sibsps,
                     parchs, cabin, enbarked]
 samples = [list(i) for i in zip(*cleaned_features)]
 # print(samples)
