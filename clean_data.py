@@ -1,3 +1,6 @@
+from sklearn.preprocessing import LabelEncoder
+
+
 csv = 'C:/Users/Manu/Documents/Python/ProjetosImagens/Titanic2/test.csv'
 cleaned_csv = 'C:/Users/Manu/Documents/Python/ProjetosImagens/Titanic2/test_cleaned.csv'
 
@@ -29,6 +32,8 @@ tickets = samples[8]
 fare = samples[9]
 cabin = samples[10]
 enbarked = samples[11]
+
+encoder = LabelEncoder() # encode categorical data
 
 # --- ids ---
 ids = list(map(int, ids))
@@ -86,14 +91,7 @@ for x in simplified_title:
 # print(status)
 
 # --- sex ---
-# female = 0, male = 1
-aux = []
-for x in sex:
-    if x == 'female':
-        aux.append(0)
-    else:
-        aux.append(1)
-sex = aux
+sex = encoder.fit_transform(sex)
 # print(sex)
 
 # --- age ---
@@ -134,7 +132,6 @@ parchs = list(map(int, parchs))
 # print(parchs)
 
 # --- cabin ---
-['A', 'B', 'C', 'D', 'E', 'F', 'T', 'G', 'Unknown']
 aux = []
 for x in cabin:
     if x != '':
@@ -162,18 +159,7 @@ cabin = aux
 # print(cabin)
 
 # --- enbarked ---
-aux = []
-for x in enbarked:
-    if x != '':
-        if x == 'C':
-            aux.append(1)
-        elif x == 'Q':
-            aux.append(2)
-        else:
-            aux.append(3)
-    else:
-        aux.append(3) # (S, most common)
-enbarked = aux
+enbarked = encoder.fit_transform(enbarked)
 # print(enbarked)
 
 cleaned_features = [ids, survived, pclass, simplified_title, status, sex, age, sibsps,
