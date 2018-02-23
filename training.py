@@ -1,18 +1,23 @@
 from sklearn.svm import SVC
+from sklearn.naive_bayes import GaussianNB
+from sklearn.neighbors import KNeighborsClassifier
 from sklearn.metrics import accuracy_score
 
 from common_functions import read_file, clean_samples, separate_features_and_classes
 
 
 # --- training ---
-file_name = 'C:/Users/Manu/Documents/Python/ProjetosImagens/Titanic2/train_cleaned.csv'
-samples = read_file(file_name)
+training_samples = read_file('C:/Users/Manu/Documents/Python/ProjetosImagens/Titanic2/train_cleaned.csv')
+test_samples = read_file('C:/Users/Manu/Documents/Python/ProjetosImagens/Titanic2/test_cleaned.csv')
+samples = training_samples + test_samples
 cleaned_samples = clean_samples(samples)
+training_cleaned_samples = cleaned_samples[:891]
+test_cleaned_samples = cleaned_samples[891:]
 
 # separate by class:
 survived = []
 not_survived = []
-for sample in cleaned_samples:
+for sample in training_cleaned_samples:
     if sample[0] == 1:
         survived.append(sample)
     else:
@@ -26,16 +31,18 @@ for i in range(0, int(len(survived) / 2)):
 # print(balanced_samples)
 
 # separate test and train sets
-numner_of_samples = len(balanced_samples)
-training_set = balanced_samples[: int(numner_of_samples * 0.8)]
-test_set = balanced_samples[int(numner_of_samples * 0.8):]
+number_of_samples = len(balanced_samples)
+training_set = balanced_samples[: int(number_of_samples * 0.85)]
+test_set = balanced_samples[int(number_of_samples * 0.85):]
 
 # separate features and classes
 training_features, training_classes = separate_features_and_classes(training_set)
 test_features, test_classes = separate_features_and_classes(test_set)
 
 # training
-clf = SVC(C=3)
+# clf = SVC(C=3)
+clf = GaussianNB()
+# clf = KNeighborsClassifier(n_neighbors=3)
 clf.fit(training_features, training_classes)
 pred = clf.predict(test_features)
 
@@ -45,11 +52,8 @@ print(accuracy)
 
 
 # --- classify test samples ---
-file_name = 'C:/Users/Manu/Documents/Python/ProjetosImagens/Titanic2/test_cleaned.csv'
-samples = read_file(file_name)
-cleaned_samples = clean_samples(samples)
-training_features, training_classes = separate_features_and_classes(balanced_samples)
-test_features, test_classes = separate_features_and_classes(cleaned_samples)
+training_features, training_classes = separate_features_and_classes(training_cleaned_samples)
+test_features, test_classes = separate_features_and_classes(test_cleaned_samples)
 clf.fit(training_features, training_classes)
 pred = clf.predict(test_features)
 
@@ -57,9 +61,9 @@ pred = clf.predict(test_features)
 file = open('C:/Users/Manu/Documents/Python/ProjetosImagens/Titanic2/output.csv', 'w')
 file.write('PassengerId,Survived\n')
 i = 0
-for sample in samples:
+for sample in test_samples:
     passenger = sample.split(',')[0]
-    file.write(passenger + ',' + str(pred[i]))
+    file.write(passenger + ',' + str(int(pred[i])))
     file.write('\n')
     i += 1
 file.close()

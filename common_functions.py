@@ -1,3 +1,6 @@
+from sklearn.preprocessing import OneHotEncoder
+
+
 def separate_features_and_classes(samples):
     features = []
     classes = []
@@ -30,4 +33,8 @@ def clean_samples(samples):
         enbarked = aux[10]
         cleaned_samples.append([survived, pclass, simplified_title, status, sex,
                                 age, sibsps, parchs, cabin, enbarked])
+
+    # deal with categorical data
+    encoder = OneHotEncoder(categorical_features = [1, 2, 3, 4, 8, 9]) # pclass, titles, status, sex
+    cleaned_samples = encoder.fit_transform(cleaned_samples).toarray()
     return cleaned_samples
