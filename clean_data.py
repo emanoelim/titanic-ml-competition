@@ -17,7 +17,7 @@ def simplify_title(row):
     elif title in ["Countess.", "Mme."]:
         return "Mrs."
     elif title in ["Mlle.", "Ms."]:
-        return "Miss"
+        return "Miss."
     elif title in ["Master."]:
         return "Master."
     elif title == "Dr.":
