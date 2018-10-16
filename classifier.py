@@ -3,32 +3,41 @@ from sklearn.naive_bayes import GaussianNB
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.metrics import accuracy_score
 
-from common_functions import read_file, clean_samples, separate_features_and_classes
+
+def read_file(file_name):
+    with open(file_name) as f:
+        samples = f.readlines()
+    return samples[1:]
 
 
-# --- training ---
-training_samples = read_file('C:/Users/Manu/Documents/Python/ProjetosImagens/Titanic2/train_cleaned.csv')
-test_samples = read_file('C:/Users/Manu/Documents/Python/ProjetosImagens/Titanic2/test_cleaned.csv')
-samples = training_samples + test_samples
-cleaned_samples = clean_samples(samples)
-training_cleaned_samples = cleaned_samples[:891]
-test_cleaned_samples = cleaned_samples[891:]
+def separate_features_and_classes(samples):
+    features = []
+    classes = []
+    for sample in samples:
+        classes.append(int(sample[-1]))
+        features.append(list(map(float, sample[:-1])))
+    return features, classes
+
+
+print("Training...")
+training_samples = read_file("new_train.csv")
 
 # separate by class:
 survived = []
 not_survived = []
-for sample in training_cleaned_samples:
-    if sample[0] == 1:
+for sample in training_samples:
+    sample = sample.replace("\n", '')
+    sample = sample.split(",")
+    if int(sample[-1]) == 1:
         survived.append(sample)
     else:
         not_survived.append(sample)
 
-# get same number of sambles of each class for training (simpler approach)
+# get same number of samples of each class (simpler approach)
 balanced_samples = []
 for i in range(0, int(len(survived) / 2)):
     balanced_samples.append(survived[i])
     balanced_samples.append(not_survived[i])
-# print(balanced_samples)
 
 # separate test and train sets
 number_of_samples = len(balanced_samples)
@@ -40,30 +49,34 @@ training_features, training_classes = separate_features_and_classes(training_set
 test_features, test_classes = separate_features_and_classes(test_set)
 
 # training
-# clf = SVC(C=3)
 clf = GaussianNB()
-# clf = KNeighborsClassifier(n_neighbors=3)
 clf.fit(training_features, training_classes)
 pred = clf.predict(test_features)
 
 # accuracy
 accuracy = accuracy_score(pred, test_classes)
-print(accuracy)
+print("Classifier accuracy: ", accuracy)
 
-
-# --- classify test samples ---
-training_features, training_classes = separate_features_and_classes(training_cleaned_samples)
-test_features, test_classes = separate_features_and_classes(test_cleaned_samples)
-clf.fit(training_features, training_classes)
+print("------------------------------------")
+print("Predict...")
+# predict test set
+test_samples = read_file("new_test.csv")
+test_features = []
+for sample in test_samples:
+    sample = sample.replace("\n", '')
+    sample = sample.split(",")
+    test_features.append(list(map(float, sample)))
 pred = clf.predict(test_features)
 
 # save a file with predictions
-file = open('C:/Users/Manu/Documents/Python/ProjetosImagens/Titanic2/output.csv', 'w')
+file = open('output.csv', 'w')
 file.write('PassengerId,Survived\n')
 i = 0
+p_id = 892
 for sample in test_samples:
-    passenger = sample.split(',')[0]
-    file.write(passenger + ',' + str(int(pred[i])))
+    file.write(str(p_id) + ',' + str(int(pred[i])))
     file.write('\n')
+    p_id += 1
     i += 1
 file.close()
+print("File saved!")
