@@ -1,7 +1,7 @@
 from pandas import read_csv
 
 
-def name_to_tile(row):
+def name_to_title(row):
     name = row["Name"]
     titles = ['Mrs.', 'Mr.', 'Master.', 'Miss.', 'Major.', 'Rev.', 'Dr.', 'Ms.', 'Mlle.', 'Col.', 'Capt.', 'Mme.',
               'Countess.', 'Don.', 'Jonkheer.']
@@ -17,7 +17,7 @@ def simplify_title(row):
     elif title in ["Countess.", "Mme."]:
         return "Mrs."
     elif title in ["Mlle.", "Ms."]:
-        return "Miss"
+        return "Miss."
     elif title in ["Master."]:
         return "Master."
     elif title == "Dr.":
@@ -72,7 +72,7 @@ mean_fare = data["Fare"].mean()
 data["Fare"] = data["Fare"].fillna(mean_fare)
 
 # new features
-data["Title"] = data.apply(lambda row: name_to_tile(row), axis = 1)
+data["Title"] = data.apply(lambda row: name_to_title(row), axis = 1)
 data["Simplified_title"] = data.apply(lambda row: simplify_title(row), axis = 1)
 data["Status"] = data.apply(lambda row: define_status(row), axis = 1)
 data["Simplified_cabin"] = data.apply(lambda row: simplify_cabin(row), axis = 1)
