@@ -1,7 +1,9 @@
+from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
 from sklearn.svm import SVC
 from sklearn.naive_bayes import GaussianNB
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.metrics import accuracy_score
+from sklearn.tree import DecisionTreeClassifier
 
 
 def read_file(file_name):
@@ -41,8 +43,9 @@ for i in range(0, int(len(survived) / 2)):
 
 # separate test and train sets
 number_of_samples = len(balanced_samples)
-training_set = balanced_samples[: int(number_of_samples * 0.85)]
-test_set = balanced_samples[int(number_of_samples * 0.85):]
+last_training_sample = int(number_of_samples * 0.80)
+training_set = balanced_samples[: last_training_sample]
+test_set = balanced_samples[last_training_sample + 1:]
 
 # separate features and classes
 training_features, training_classes = separate_features_and_classes(training_set)
@@ -57,7 +60,7 @@ pred = clf.predict(test_features)
 accuracy = accuracy_score(pred, test_classes)
 print("Classifier accuracy: ", accuracy)
 
-print("------------------------------------")
+print("----------------------------------------")
 print("Predict...")
 # predict test set
 test_samples = read_file("new_test.csv")
