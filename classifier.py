@@ -37,13 +37,13 @@ for sample in training_samples:
 
 # get same number of samples of each class (simpler approach)
 balanced_samples = []
-for i in range(0, int(len(survived) / 2)):
+for i in range(0, int(len(survived))):
     balanced_samples.append(survived[i])
     balanced_samples.append(not_survived[i])
 
 # separate test and train sets
 number_of_samples = len(balanced_samples)
-last_training_sample = int(number_of_samples * 0.80)
+last_training_sample = int(number_of_samples * 0.8)
 training_set = balanced_samples[: last_training_sample]
 test_set = balanced_samples[last_training_sample + 1:]
 

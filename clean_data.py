@@ -81,8 +81,10 @@ def fill_age_by_title(age, title):
             age = mean_age_older_people(data)
     return age
 
+
 def fill_missing_ages(data):
     data["Age"] = data.apply(lambda row: fill_age_by_title(row.Age, row.SimplifiedTitle), axis=1)
+
 
 def fill_missing_fares(data):
     mean_fare = data["Fare"].mean()
