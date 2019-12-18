@@ -4,6 +4,7 @@ from sklearn.naive_bayes import GaussianNB
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.metrics import accuracy_score
 from sklearn.tree import DecisionTreeClassifier
+from sklearn.linear_model import LogisticRegression
 
 
 def read_file(file_name):
@@ -43,7 +44,7 @@ for i in range(0, int(len(survived))):
 
 # separate test and train sets
 number_of_samples = len(balanced_samples)
-last_training_sample = int(number_of_samples * 0.8)
+last_training_sample = int(number_of_samples * 0.85)
 training_set = balanced_samples[: last_training_sample]
 test_set = balanced_samples[last_training_sample + 1:]
 

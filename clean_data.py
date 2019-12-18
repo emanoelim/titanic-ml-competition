@@ -64,13 +64,17 @@ def simplify_cabin(row):
 def mean_age_younger_people(data):
     younger_people = data[data["Title"].isin(["Miss.", "Master."])]
     younger_people = younger_people.dropna(subset=["Age"])
-    return int(younger_people["Age"].mean())
+    mean_age = int(younger_people["Age"].mean())
+    # print(mean_age)
+    return mean_age
 
 
 def mean_age_older_people(data):
     older_people = data[data["Title"].isin(["Mr.", "Mrs."])]
     older_people = older_people.dropna(subset=["Age"])
-    return int(older_people["Age"].mean())
+    mean_age = int(older_people["Age"].mean())
+    # print(mean_age)
+    return mean_age
 
 
 def fill_age_by_title(age, title):
@@ -91,32 +95,71 @@ def fill_missing_fares(data):
     data["Fare"] = data["Fare"].fillna(mean_fare)
 
 
-file_name = "test.csv"
+def fill_embarked(row):
+    embarked = row["Embarked"]
+    if pd.notna(embarked):
+        if 'S' in embarked:
+            return "Southampton"
+        elif 'C' in embarked:
+            return "Cherbourg"
+        elif 'Q' in embarked:
+            return "Queenstown"
+    else:
+        return "Southampton"
+
+
+def age_range(row):
+    age = row["Age"]
+    if age < 15:
+        return "Child"
+    elif age < 21:
+        return "Young"
+    elif age < 60:
+        return 'Adult'
+    else:
+        return "Old"
+
+# ---------------------
+file_name = "train.csv"
 data = pd.read_csv(file_name)
 
+# new columns, fill missing data
 data["Title"] = data.apply(lambda row: name_to_title(row), axis = 1)
 data["SimplifiedTitle"] = data.apply(lambda row: simplify_title(row), axis = 1)
-data["Status"] = data.apply(lambda row: define_status(row), axis = 1)
-data["SimplifiedCabin"] = data.apply(lambda row: simplify_cabin(row), axis = 1)
 fill_missing_ages(data)
 fill_missing_fares(data)
+data["Status"] = data.apply(lambda row: define_status(row), axis = 1)
+data["SimplifiedCabin"] = data.apply(lambda row: simplify_cabin(row), axis = 1)
+data["FamilySize"] = data.apply(lambda row: row.Parch + row.SibSp, axis=1)
+data["Alone"] = data.apply(lambda row: 'not_alone' if row.FamilySize else 'alone', axis=1)
+data["AgeRange"] =  data.apply(lambda row: age_range(row), axis = 1)
+data["Embarked"] = data.apply(lambda row: fill_embarked(row), axis = 1)
+
+# normalize
+data["Age"] = ((data["Age"] - data["Age"].min()) / (data["Age"].max() - data["Age"].min()))
+data["Fare"] = ((data["Fare"] - data["Fare"].min()) / (data["Fare"].max() - data["Fare"].min()))
+data["Parch"] = ((data["Parch"] - data["Parch"].min()) / (data["Parch"].max() - data["Parch"].min()))
+data["SibSp"] = ((data["SibSp"] - data["SibSp"].min()) / (data["SibSp"].max() - data["SibSp"].min()))
+data["FamilySize"] = ((data["FamilySize"] - data["FamilySize"].min()) / (data["FamilySize"].max() - data["FamilySize"].min()))
 
 # deal with categorical data
 dummy_sex = pd.get_dummies(data["Sex"])
 dummy_status = pd.get_dummies(data["Status"])
 dummy_cabin = pd.get_dummies(data["SimplifiedCabin"])
-data = pd.concat([data, dummy_sex, dummy_status, dummy_cabin], axis=1)
-
-# new columns
-data["FamilySize"] = data.apply(lambda row: row.Parch + row.SibSp, axis=1)
-data["Alone"] = data.apply(lambda row: 0 if row.FamilySize else 1, axis=1)
+dummy_alone = pd.get_dummies(data["Alone"])
+dummy_age_range = pd.get_dummies(data["AgeRange"])
+dummy_embarked = pd.get_dummies(data["Embarked"])
+dummy_title = pd.get_dummies(data["SimplifiedTitle"])
+data = pd.concat([data, dummy_sex, dummy_status, dummy_cabin, dummy_alone, dummy_age_range, dummy_embarked, dummy_title], axis=1)
 
 # save file with columns that will be used
-columns = ["Pclass", "Age", "female", "male", "SibSp", "Parch", "Alone", "married", "single", "A", "B", "C", "D", "E", "F", "G", "U", "Fare", "Survived"]
+columns = ["Pclass", "Age", "female", "male", "Mrs.", "Miss.", "Master.", "Mr.", "alone", "not_alone", "Southampton", "Cherbourg", "Queenstown", "Fare", "Survived"]
+# columns = ["Pclass", "Age", "AgeRange", "Sex", "SimplifiedTitle", "SibSp", "Parch", "FamilySize", "Alone", "Status", "SimplifiedCabin", "Fare", "Embarked", "Survived"]
 if "train" in file_name:
     new_data = data[columns]
 else:
     features = columns.remove("Survived")
     new_data = data[columns]
 new_data.to_csv("new_" + file_name)
+# new_data.to_csv("analysis_" + file_name)
 
