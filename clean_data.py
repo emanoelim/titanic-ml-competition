@@ -120,7 +120,7 @@ def age_range(row):
         return "Old"
 
 # ---------------------
-file_name = "train.csv"
+file_name = "test.csv"
 data = pd.read_csv(file_name)
 
 # new columns, fill missing data
@@ -153,7 +153,7 @@ dummy_title = pd.get_dummies(data["SimplifiedTitle"])
 data = pd.concat([data, dummy_sex, dummy_status, dummy_cabin, dummy_alone, dummy_age_range, dummy_embarked, dummy_title], axis=1)
 
 # save file with columns that will be used
-columns = ["Pclass", "Age", "female", "male", "Mrs.", "Miss.", "Master.", "Mr.", "alone", "not_alone", "Southampton", "Cherbourg", "Queenstown", "Fare", "Survived"]
+columns = ["Pclass", "Age", "female", "male", "Mrs.", "Miss.", "Master.", "Mr.", "alone", "not_alone", "Fare", "Survived"]
 # columns = ["Pclass", "Age", "AgeRange", "Sex", "SimplifiedTitle", "SibSp", "Parch", "FamilySize", "Alone", "Status", "SimplifiedCabin", "Fare", "Embarked", "Survived"]
 if "train" in file_name:
     new_data = data[columns]

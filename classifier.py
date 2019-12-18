@@ -1,8 +1,7 @@
-from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import cross_val_score
 from sklearn.svm import SVC
-from sklearn.naive_bayes import GaussianNB
 from sklearn.neighbors import KNeighborsClassifier
-from sklearn.metrics import accuracy_score
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.linear_model import LogisticRegression
 
@@ -22,7 +21,6 @@ def separate_features_and_classes(samples):
     return features, classes
 
 
-print("Training...")
 training_samples = read_file("new_train.csv")
 
 # separate by class:
@@ -52,18 +50,41 @@ test_set = balanced_samples[last_training_sample + 1:]
 training_features, training_classes = separate_features_and_classes(training_set)
 test_features, test_classes = separate_features_and_classes(test_set)
 
-# training
-clf = GaussianNB()
+# cross validation
+"""
+X, y = separate_features_and_classes(balanced_samples)
+svm = SVC(kernel='linear', C=1)
+scores = cross_val_score(svm, X, y, cv=3)
+media = scores.mean()
+print("scores SVC: ", scores, "- mean: ", media)
+
+knn = KNeighborsClassifier(n_neighbors=3)
+scores = cross_val_score(knn, X, y, cv=3)
+media = scores.mean()
+print("scores KNN: ", scores, "- mean: ", media)
+
+dt = DecisionTreeClassifier()
+scores = cross_val_score(dt, X, y, cv=3)
+media = scores.mean()
+print("scores DT: ", scores, "- mean: ", media)
+
+lg = LogisticRegression()
+scores = cross_val_score(lg, X, y, cv=3)
+media = scores.mean()
+print("scores LR: ", scores, "- mean: ", media)
+
+rf = RandomForestClassifier()
+scores = cross_val_score(rf, X, y, cv=3)
+media = scores.mean()
+print("scores RF: ", scores, "- mean: ", media)
+"""
+
+print("Training...")
+clf = SVC(kernel='linear', C=1)
 clf.fit(training_features, training_classes)
 pred = clf.predict(test_features)
 
-# accuracy
-accuracy = accuracy_score(pred, test_classes)
-print("Classifier accuracy: ", accuracy)
-
-print("----------------------------------------")
-print("Predict...")
-# predict test set
+print("Predicting...")
 test_samples = read_file("new_test.csv")
 test_features = []
 for sample in test_samples:
@@ -72,7 +93,7 @@ for sample in test_samples:
     test_features.append(list(map(float, sample)))
 pred = clf.predict(test_features)
 
-# save a file with predictions
+print("Saving output file...")
 file = open('output.csv', 'w')
 file.write('PassengerId,Survived\n')
 i = 0

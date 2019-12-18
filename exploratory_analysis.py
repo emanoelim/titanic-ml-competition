@@ -8,30 +8,33 @@ titanic = pd.read_csv(file_name)
 
 survived_by_class = titanic[['Pclass', 'Survived']].groupby(['Pclass'], as_index=False).mean().sort_values(by='Survived', ascending=False)
 print(survived_by_class)
-
+print("---------------")
 survived_by_sex = titanic[['Sex', 'Survived']].groupby(['Sex'], as_index=False).mean().sort_values(by='Survived', ascending=False)
 print(survived_by_sex)
-
+print("---------------")
 survived_by_alone = titanic[['Alone', 'Survived']].groupby(['Alone'], as_index=False).mean().sort_values(by='Survived', ascending=False)
 print(survived_by_alone)
-
+print("---------------")
 survived_by_age = titanic[['AgeRange', 'Survived']].groupby(['AgeRange'], as_index=False).mean().sort_values(by='Survived', ascending=False)
 print(survived_by_age)
-
+print("---------------")
 survived_by_sibsp = titanic[['SibSp', 'Survived']].groupby(['SibSp'], as_index=False).mean().sort_values(by='Survived', ascending=False)
 print(survived_by_sibsp)
-
+print("---------------")
 survived_by_parch = titanic[['Parch', 'Survived']].groupby(['Parch'], as_index=False).mean().sort_values(by='Survived', ascending=False)
 print(survived_by_parch)
-
+print("---------------")
 survived_by_family = titanic[['FamilySize', 'Survived']].groupby(['FamilySize'], as_index=False).mean().sort_values(by='Survived', ascending=False)
 print(survived_by_family)
-
+print("---------------")
 survived_by_status = titanic[['Status', 'Survived']].groupby(['Status'], as_index=False).mean().sort_values(by='Survived', ascending=False)
 print(survived_by_status)
-
+print("---------------")
 survived_by_title = titanic[['SimplifiedTitle', 'Survived']].groupby(['SimplifiedTitle'], as_index=False).mean().sort_values(by='Survived', ascending=False)
 print(survived_by_title)
+print("---------------")
+survived_by_cabin = titanic[['SimplifiedCabin', 'Survived']].groupby(['SimplifiedCabin'], as_index=False).mean().sort_values(by='Survived', ascending=False)
+print(survived_by_cabin)
 
 plt.subplot(4, 3, 1)
 sns.countplot(x = "Survived", data = titanic)
