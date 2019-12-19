@@ -1,5 +1,6 @@
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import cross_val_score
+from sklearn.naive_bayes import GaussianNB
 from sklearn.svm import SVC
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.tree import DecisionTreeClassifier
@@ -51,36 +52,45 @@ training_features, training_classes = separate_features_and_classes(training_set
 test_features, test_classes = separate_features_and_classes(test_set)
 
 # cross validation
-"""
 X, y = separate_features_and_classes(balanced_samples)
 svm = SVC(kernel='linear', C=1)
 scores = cross_val_score(svm, X, y, cv=3)
 media = scores.mean()
-print("scores SVC: ", scores, "- mean: ", media)
+dp = scores.std()
+print("scores SVC:", scores, "- mean:", media, "- SD:", dp)
 
 knn = KNeighborsClassifier(n_neighbors=3)
 scores = cross_val_score(knn, X, y, cv=3)
 media = scores.mean()
-print("scores KNN: ", scores, "- mean: ", media)
+dp = scores.std()
+print("scores KNN:", scores, "- mean:", media, "- SD:", dp)
 
 dt = DecisionTreeClassifier()
 scores = cross_val_score(dt, X, y, cv=3)
 media = scores.mean()
-print("scores DT: ", scores, "- mean: ", media)
+dp = scores.std()
+print("scores DT:", scores, "- mean:", media, "- SD:", dp)
 
 lg = LogisticRegression()
 scores = cross_val_score(lg, X, y, cv=3)
 media = scores.mean()
-print("scores LR: ", scores, "- mean: ", media)
+dp = scores.std()
+print("scores LR:", scores, "- mean:", media, "- SD:", dp)
 
-rf = RandomForestClassifier()
+rf = RandomForestClassifier(n_estimators=100)
 scores = cross_val_score(rf, X, y, cv=3)
 media = scores.mean()
-print("scores RF: ", scores, "- mean: ", media)
-"""
+dp = scores.std()
+print("scores RF:", scores, "- mean:", media, "- SD:", dp)
+
+nb = GaussianNB()
+scores = cross_val_score(nb, X, y, cv=3)
+media = scores.mean()
+dp = scores.std()
+print("scores NB:", scores, "- mean:", media, "- SD:", dp)
 
 print("Training...")
-clf = SVC(kernel='linear', C=1)
+clf = GaussianNB()
 clf.fit(training_features, training_classes)
 pred = clf.predict(test_features)
 
