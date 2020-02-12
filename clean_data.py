@@ -143,23 +143,20 @@ data["SibSp"] = ((data["SibSp"] - data["SibSp"].min()) / (data["SibSp"].max() - 
 data["FamilySize"] = ((data["FamilySize"] - data["FamilySize"].min()) / (data["FamilySize"].max() - data["FamilySize"].min()))
 
 # deal with categorical data
+dummy_class = pd.get_dummies(data["Pclass"])
 dummy_sex = pd.get_dummies(data["Sex"])
 dummy_status = pd.get_dummies(data["Status"])
 dummy_cabin = pd.get_dummies(data["SimplifiedCabin"])
+dummy_title = pd.get_dummies(data["SimplifiedTitle"])
 dummy_alone = pd.get_dummies(data["Alone"])
 dummy_age_range = pd.get_dummies(data["AgeRange"])
 dummy_embarked = pd.get_dummies(data["Embarked"])
-dummy_title = pd.get_dummies(data["SimplifiedTitle"])
-data = pd.concat([data, dummy_sex, dummy_status, dummy_cabin, dummy_alone, dummy_age_range, dummy_embarked, dummy_title], axis=1)
 
-# save file with columns that will be used
-columns = ["Pclass", "Age", "female", "male", "FamilySize", "alone", "not_alone", "Fare", "Survived"]
-# columns = ["Pclass", "Age", "AgeRange", "Sex", "SimplifiedTitle", "SibSp", "Parch", "FamilySize", "Alone", "Status", "SimplifiedCabin", "Fare", "Embarked", "Survived"]
+data.to_csv("analysis_" + file_name, index=False)
+
 if "train" in file_name:
-    new_data = data[columns]
+    data = pd.concat([data["Age"], data["Fare"], data["Parch"], data["SibSp"], data["FamilySize"], dummy_sex, dummy_status, dummy_cabin, dummy_title, dummy_alone, dummy_age_range, dummy_embarked, data["Survived"]], axis=1)
 else:
-    features = columns.remove("Survived")
-    new_data = data[columns]
-new_data.to_csv("new_" + file_name)
-# new_data.to_csv("analysis_" + file_name)
+    data = pd.concat([data["Age"], data["Fare"], data["Parch"], data["SibSp"], data["FamilySize"], dummy_sex, dummy_status, dummy_cabin, dummy_title, dummy_alone, dummy_age_range, dummy_embarked], axis=1)
+data.to_csv("new_" + file_name, index=False)
 

@@ -1,106 +1,53 @@
+import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.model_selection import cross_val_score
-from sklearn.naive_bayes import GaussianNB
-from sklearn.svm import SVC
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score
+from matplotlib import pyplot as plt
 
-
-def read_file(file_name):
-    with open(file_name) as f:
-        samples = f.readlines()
-    return samples[1:]
-
-
-def separate_features_and_classes(samples):
-    features = []
-    classes = []
-    for sample in samples:
-        classes.append(int(sample[-1]))
-        features.append(list(map(float, sample[:-1])))
-    return features, classes
-
-
-training_samples = read_file("new_train.csv")
 
 # separate by class:
-survived = []
-not_survived = []
-for sample in training_samples:
-    sample = sample.replace("\n", '')
-    sample = sample.split(",")
-    if int(sample[-1]) == 1:
-        survived.append(sample)
-    else:
-        not_survived.append(sample)
+training_samples = pd.read_csv("new_train.csv")
+survived = training_samples.loc[training_samples['Survived'] == 1]
+not_survived = training_samples.loc[training_samples['Survived'] == 0]
+len_survived = len(survived.index)
 
-# get same number of samples of each class (simpler approach)
-balanced_samples = []
-for i in range(0, int(len(survived))):
-    balanced_samples.append(survived[i])
-    balanced_samples.append(not_survived[i])
+# get same number of survived and not survived samples
+not_survived = not_survived[0:len_survived]
+len_not_survived = len_survived
 
 # separate test and train sets
-number_of_samples = len(balanced_samples)
-last_training_sample = int(number_of_samples * 0.85)
-training_set = balanced_samples[: last_training_sample]
-test_set = balanced_samples[last_training_sample + 1:]
+perc = 0.85
+survived_training = survived[0:int(len_survived*perc)]
+survived_test = survived[int(len_survived*perc):]
+not_survived_training = not_survived[0:int(len_not_survived*perc)]
+not_survived_test = not_survived[int(len_not_survived*perc):]
+training_samples = survived_training.append(not_survived_training)
+test_samples = survived_test.append(not_survived_test)
 
-# separate features and classes
-training_features, training_classes = separate_features_and_classes(training_set)
-test_features, test_classes = separate_features_and_classes(test_set)
+# separete features and classes
+training_classes = training_samples["Survived"]
+training_features = training_samples.drop("Survived", 1)
+test_classes = test_samples["Survived"]
+test_features = test_samples.drop("Survived", 1)
 
-# cross validation
-X, y = separate_features_and_classes(balanced_samples)
-svm = SVC(kernel='linear', C=1)
-scores = cross_val_score(svm, X, y, cv=3)
-media = scores.mean()
-dp = scores.std()
-print("scores SVC:", scores, "- mean:", media, "- SD:", dp)
-
-knn = KNeighborsClassifier(n_neighbors=3)
-scores = cross_val_score(knn, X, y, cv=3)
-media = scores.mean()
-dp = scores.std()
-print("scores KNN:", scores, "- mean:", media, "- SD:", dp)
-
-dt = DecisionTreeClassifier()
-scores = cross_val_score(dt, X, y, cv=3)
-media = scores.mean()
-dp = scores.std()
-print("scores DT:", scores, "- mean:", media, "- SD:", dp)
-
-lg = LogisticRegression()
-scores = cross_val_score(lg, X, y, cv=3)
-media = scores.mean()
-dp = scores.std()
-print("scores LR:", scores, "- mean:", media, "- SD:", dp)
-
-rf = RandomForestClassifier(n_estimators=100)
-scores = cross_val_score(rf, X, y, cv=3)
-media = scores.mean()
-dp = scores.std()
-print("scores RF:", scores, "- mean:", media, "- SD:", dp)
-
-nb = GaussianNB()
-scores = cross_val_score(nb, X, y, cv=3)
-media = scores.mean()
-dp = scores.std()
-print("scores NB:", scores, "- mean:", media, "- SD:", dp)
-
-print("Training...")
-clf = GaussianNB()
+print("############ Training ############")
+clf = RandomForestClassifier(n_estimators=50, max_features='sqrt')
 clf.fit(training_features, training_classes)
-pred = clf.predict(test_features)
 
-print("Predicting...")
-test_samples = read_file("new_test.csv")
-test_features = []
-for sample in test_samples:
-    sample = sample.replace("\n", '')
-    sample = sample.split(",")
-    test_features.append(list(map(float, sample)))
+# features importance
+features = pd.DataFrame()
+features['feature'] = training_features.columns
+features['importance'] = clf.feature_importances_
+features.sort_values(by=['importance'], ascending=True, inplace=True)
+features.set_index('feature', inplace=True)
+features.plot(kind='barh', figsize=(25, 25))
+plt.show()
+
+pred = clf.predict(test_features)
+acc = accuracy_score(pred, test_classes)
+print("Accuracy: ", acc)
+
+print("############ Predict ############")
+test_features = pd.read_csv("new_test.csv")
 pred = clf.predict(test_features)
 
 print("Saving output file...")
@@ -108,7 +55,7 @@ file = open('output.csv', 'w')
 file.write('PassengerId,Survived\n')
 i = 0
 p_id = 892
-for sample in test_samples:
+for i in pred:
     file.write(str(p_id) + ',' + str(int(pred[i])))
     file.write('\n')
     p_id += 1
