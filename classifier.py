@@ -5,6 +5,8 @@ from matplotlib import pyplot as plt
 
 
 # separate by class:
+from sklearn.naive_bayes import GaussianNB
+
 training_samples = pd.read_csv("new_train.csv")
 survived = training_samples.loc[training_samples['Survived'] == 1]
 not_survived = training_samples.loc[training_samples['Survived'] == 0]
@@ -42,12 +44,18 @@ features.set_index('feature', inplace=True)
 features.plot(kind='barh', figsize=(25, 25))
 plt.show()
 
+print("############ Classifier with best features ############")
+clf = GaussianNB()
+training_features = training_samples[["Fare", "Age", "female", "male", "FamilySize", "Master.", "Miss.", "Mr.", "Mrs."]]
+test_features = test_features[["Fare", "Age", "female", "male", "FamilySize", "Master.", "Miss.", "Mr.", "Mrs."]]
+clf.fit(training_features, training_classes)
 pred = clf.predict(test_features)
 acc = accuracy_score(pred, test_classes)
 print("Accuracy: ", acc)
 
 print("############ Predict ############")
 test_features = pd.read_csv("new_test.csv")
+test_features = test_features[["Fare", "Age", "female", "male", "FamilySize", "Master.", "Miss.", "Mr.", "Mrs."]]
 pred = clf.predict(test_features)
 
 print("Saving output file...")
