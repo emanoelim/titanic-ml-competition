@@ -2,11 +2,10 @@ import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score
 from matplotlib import pyplot as plt
+from sklearn.naive_bayes import GaussianNB
 
 
 # separate by class:
-from sklearn.naive_bayes import GaussianNB
-
 training_samples = pd.read_csv("new_train.csv")
 survived = training_samples.loc[training_samples['Survived'] == 1]
 not_survived = training_samples.loc[training_samples['Survived'] == 0]
